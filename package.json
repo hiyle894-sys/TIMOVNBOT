@@ -1,0 +1,20 @@
+{
+  "name": "timovnbot",
+  "version": "1.0.0",
+  "description": "TimeBot - Smart Schedule Management System",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [
+    "timebot",
+    "telegram-bot",
+    "schedule-manager",
+    "gemini-ai"
+  ],
+  "author": "",
+  "license": "ISC",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
