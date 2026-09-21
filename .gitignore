@@ -1,0 +1,16 @@
+# Database
+timebot.db
+timebot.db-journal
+*.db
+
+# Logs
+*.log
+
+# Dependencies
+node_modules/
+
+# Scratch & Temporary test scripts
+scratch_*.js
+
+# Environment
+.env

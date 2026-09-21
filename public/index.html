@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TimeBot — Quản Lý Thời Gian Thông Minh</title>
+    <!-- Modern Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation (Desktop / Tablet) -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <div class="logo-icon">🤖</div>
+                <div class="brand-text">
+                    <h1>TimeBot</h1>
+                    <span>Smart Assistant</span>
+                </div>
+            </div>
+
+            <nav class="nav-menu">
+                <button class="nav-item active" data-target="home-page">
+                    <span class="nav-icon">🏠</span>
+                    <span class="nav-label">Trang chủ</span>
+                </button>
+                <button class="nav-item" data-target="settings-page">
+                    <span class="nav-icon">⚙️</span>
+                    <span class="nav-label">Cài đặt</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="live-clock-card">
+                    <span class="clock-icon">⏰</span>
+                    <div class="clock-info">
+                        <span id="sidebar-time">--:--:--</span>
+                        <span id="sidebar-date">--/--/----</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Header -->
+            <header class="top-header">
+                <div class="header-titles">
+                    <h2 id="header-page-title">Trang chủ</h2>
+                    <p class="header-subtitle">Quản lý thời gian thông minh</p>
+                </div>
+                
+                <div class="header-actions">
+                    <div class="sync-badge" id="sync-status" title="Trạng thái đồng bộ Realtime">
+                        <span class="status-dot green"></span>
+                        <span class="sync-text">Realtime SSE</span>
+                    </div>
+
+                    <button class="icon-btn" id="btn-notifications" title="Thông báo">
+                        🔔
+                        <span class="badge-count" id="notif-count">0</span>
+                    </button>
+
+                    <div class="user-profile">
+                        <div class="avatar">👤</div>
+                        <span class="user-name">TimeBot User</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- PAGE 1: HOME PAGE -->
+            <div class="page-view active" id="home-page">
+                <!-- 3 Stat Cards -->
+                <section class="stats-grid">
+                    <div class="stat-card glass-card">
+                        <div class="stat-icon-wrapper blue">📋</div>
+                        <div class="stat-details">
+                            <span class="stat-title">Tổng lịch trình</span>
+                            <div class="stat-value-row">
+                                <span class="stat-number" id="stat-total">0</span>
+                                <span class="stat-unit">Lịch trình</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card glass-card">
+                        <div class="stat-icon-wrapper purple">⏱️</div>
+                        <div class="stat-details">
+                            <span class="stat-title">Tổng thời gian làm việc</span>
+                            <div class="stat-value-row">
+                                <span class="stat-number" id="stat-duration">0h 0m</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card glass-card">
+                        <div class="stat-icon-wrapper green">✅</div>
+                        <div class="stat-details">
+                            <span class="stat-title">Đã hoàn thành</span>
+                            <div class="stat-value-row">
+                                <span class="stat-number" id="stat-completed">0</span>
+                                <span class="stat-unit">Lịch trình</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Search & Filters Bar -->
+                <section class="filter-section glass-card">
+                    <div class="search-box">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="search-input" placeholder="Tìm kiếm lịch trình...">
+                    </div>
+
+                    <div class="filter-date-group">
+                        <span class="filter-label">📅 Ngày:</span>
+                        <div class="filter-pills">
+                            <button class="pill-btn active" data-date="all">Tất cả</button>
+                            <button class="pill-btn" data-date="today">Hôm nay</button>
+                            <button class="pill-btn" data-date="tomorrow">Ngày mai</button>
+                        </div>
+                        <input type="date" id="filter-custom-date" class="date-picker-input">
+                    </div>
+                </section>
+
+                <!-- Schedule List Section -->
+                <section class="schedules-section">
+                    <div class="section-header">
+                        <h3>📅 Lịch trình</h3>
+                        <button class="btn btn-primary" id="btn-open-create-modal">
+                            <span>＋ Thêm lịch</span>
+                        </button>
+                    </div>
+
+                    <!-- Skeleton Loader -->
+                    <div class="skeleton-container" id="skeleton-loader">
+                        <div class="skeleton-card"></div>
+                        <div class="skeleton-card"></div>
+                        <div class="skeleton-card"></div>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div class="empty-state hidden" id="empty-state">
+                        <div class="empty-icon">🗓️</div>
+                        <h4>Chưa có lịch trình</h4>
+                        <p>Hãy tạo lịch đầu tiên của bạn để bắt đầu quản lý thời gian hiệu quả.</p>
+                        <button class="btn btn-primary" id="btn-empty-add">＋ Thêm lịch</button>
+                    </div>
+
+                    <!-- Card List Container -->
+                    <div class="schedule-grid" id="schedule-list"></div>
+                </section>
+            </div>
+
+            <!-- PAGE 2: SETTINGS PAGE -->
+            <div class="page-view" id="settings-page">
+                <div class="settings-grid">
+                    <!-- Card 1: AI Provider Settings -->
+                    <div class="settings-card glass-card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <span class="icon">🤖</span>
+                                <div>
+                                    <h3>AI API Settings</h3>
+                                    <p>Cấu hình AI phân tích dán lịch tự động</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="setting-ai-provider">AI Provider</label>
+                                <select id="setting-ai-provider" class="form-control">
+                                    <option value="gemini">Google Gemini API</option>
+                                    <option value="openai">OpenAI API (GPT-4o / Mini)</option>
+                                    <option value="custom">API tương thích OpenAI (Custom Endpoint)</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="setting-ai-model">AI Model</label>
+                                <input type="text" id="setting-ai-model" class="form-control" placeholder="gemini-1.5-flash hoặc gpt-4o-mini">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="setting-ai-key">API Key</label>
+                                <div class="input-with-badge">
+                                    <input type="password" id="setting-ai-key" class="form-control" placeholder="Nhập API Key mới...">
+                                    <span class="key-status-badge" id="ai-key-status">Chưa cấu hình</span>
+                                </div>
+                                <small class="form-hint">API Key được lưu bảo mật ở backend và hiển thị dạng masked (••••1234).</small>
+                            </div>
+
+                            <button class="btn btn-primary" id="btn-save-ai-settings">
+                                💾 Lưu AI Settings
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Card 2: Telegram Bot Settings -->
+                    <div class="settings-card glass-card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <span class="icon">📱</span>
+                                <div>
+                                    <h3>Telegram Bot</h3>
+                                    <p>Kết nối và tự động gửi thông báo Telegram</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="setting-tele-token">Bot Token</label>
+                                <div class="input-with-badge">
+                                    <input type="password" id="setting-tele-token" class="form-control" placeholder="123456789:ABCdefGhIJK...">
+                                    <span class="key-status-badge" id="tele-token-status">Chưa cấu hình</span>
+                                </div>
+                            </div>
+
+                            <div class="bot-connection-status hidden" id="bot-info-box">
+                                <span class="status-indicator green">🟢 Bot đã kết nối</span>
+                                <div class="bot-details">
+                                    <strong id="bot-name">TimeBot</strong>
+                                    <span id="bot-username">@username</span>
+                                </div>
+                            </div>
+
+                            <div class="button-group">
+                                <button class="btn btn-primary" id="btn-save-tele-settings">
+                                    💾 Lưu Bot Token
+                                </button>
+                                <button class="btn btn-secondary" id="btn-test-tele-msg">
+                                    🧪 Test tin nhắn
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Mobile Bottom Navigation -->
+        <nav class="mobile-bottom-nav">
+            <button class="mobile-nav-item active" data-target="home-page">
+                <span class="icon">🏠</span>
+                <span>Home</span>
+            </button>
+            <button class="mobile-nav-item" id="btn-mobile-add">
+                <span class="icon add-circle">＋</span>
+            </button>
+            <button class="mobile-nav-item" data-target="settings-page">
+                <span class="icon">⚙️</span>
+                <span>Settings</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- 5-STEP SCHEDULE CREATION MODAL -->
+    <div class="modal-backdrop hidden" id="create-modal-backdrop">
+        <div class="modal-card glass-card">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h3 id="modal-title">Thêm lịch trình mới</h3>
+                <button class="close-btn" id="btn-close-modal">✕</button>
+            </div>
+
+            <!-- Progress Indicator -->
+            <div class="step-progress-bar">
+                <div class="step-node active" data-step="1">①</div>
+                <div class="step-line"></div>
+                <div class="step-node" data-step="2">②</div>
+                <div class="step-line"></div>
+                <div class="step-node" data-step="3">③</div>
+                <div class="step-line"></div>
+                <div class="step-node" data-step="4">④</div>
+                <div class="step-line"></div>
+                <div class="step-node" data-step="5">⑤</div>
+            </div>
+
+            <!-- Step Content Container -->
+            <div class="modal-body">
+                <!-- STEP 1: Title -->
+                <div class="wizard-step active" id="modal-step-1">
+                    <h4>① Tên lịch trình</h4>
+                    <p class="step-desc">Nhập công việc hoặc sự kiện bạn cần sắp xếp.</p>
+                    <div class="form-group">
+                        <input type="text" id="input-step-title" class="form-control" placeholder="Ví dụ: Học giải phẫu, Tập gym..." autofocus>
+                    </div>
+                </div>
+
+                <!-- STEP 2: Date -->
+                <div class="wizard-step" id="modal-step-2">
+                    <h4>② Ngày thực hiện</h4>
+                    <p class="step-desc">Chọn ngày bắt đầu công việc.</p>
+                    <div class="button-grid">
+                        <button class="btn btn-outline" id="btn-date-today">📅 Hôm nay</button>
+                        <button class="btn btn-outline" id="btn-date-tomorrow">➡️ Ngày mai</button>
+                    </div>
+                    <div class="date-picker-wrapper">
+                        <label>Hoặc chọn ngày cụ thể (dd/mm/yyyy):</label>
+                        <input type="date" id="input-step-date" class="form-control">
+                    </div>
+                </div>
+
+                <!-- STEP 3: Start Time -->
+                <div class="wizard-step" id="modal-step-3">
+                    <h4>③ Thời gian bắt đầu</h4>
+                    <p class="step-desc">Nhập giờ bắt đầu (Ví dụ: 17:00 hoặc nhập nhanh 1700).</p>
+                    <div class="form-group">
+                        <input type="text" id="input-step-starttime" class="form-control time-input-lg" placeholder="17:00">
+                    </div>
+                </div>
+
+                <!-- STEP 4: End Time -->
+                <div class="wizard-step" id="modal-step-4">
+                    <h4>④ Thời gian kết thúc</h4>
+                    <p class="step-desc">Nhập thời gian kết thúc hoặc chọn thời lượng nhanh.</p>
+                    <div class="form-group">
+                        <input type="text" id="input-step-endtime" class="form-control time-input-lg" placeholder="18:00">
+                    </div>
+                    <div class="quick-duration-grid">
+                        <button class="btn btn-chip" data-dur="15">＋15 phút</button>
+                        <button class="btn btn-chip" data-dur="30">＋30 phút</button>
+                        <button class="btn btn-chip" data-dur="45">＋45 phút</button>
+                        <button class="btn btn-chip" data-dur="60">＋1 giờ</button>
+                        <button class="btn btn-chip" data-dur="90">＋1 giờ 30</button>
+                        <button class="btn btn-chip" data-dur="120">＋2 giờ</button>
+                    </div>
+                </div>
+
+                <!-- STEP 5: Pre-reminder -->
+                <div class="wizard-step" id="modal-step-5">
+                    <h4>⑤ Thời gian báo trước</h4>
+                    <p class="step-desc">Hệ thống sẽ tự động nhắc nhở Telegram trước thời gian bắt đầu.</p>
+                    <div class="quick-reminder-grid">
+                        <button class="btn btn-chip" data-rem="5">🔔 +5 phút</button>
+                        <button class="btn btn-chip" data-rem="10">🔔 +10 phút</button>
+                        <button class="btn btn-chip active" data-rem="15">🔔 +15 phút</button>
+                        <button class="btn btn-chip" data-rem="20">🔔 +20 phút</button>
+                        <button class="btn btn-chip" data-rem="30">🔔 +30 phút</button>
+                        <button class="btn btn-chip" data-rem="45">🔔 +45 phút</button>
+                        <button class="btn btn-chip" data-rem="60">🔔 +1 giờ</button>
+                    </div>
+                </div>
+
+                <!-- CONFIRM STEP -->
+                <div class="wizard-step" id="modal-step-confirm">
+                    <h4>📋 Xác nhận lịch trình</h4>
+                    <div class="summary-box glass-card">
+                        <div class="summary-item">
+                            <span class="label">📌 Tên lịch</span>
+                            <strong id="confirm-val-title">--</strong>
+                        </div>
+                        <div class="summary-item">
+                            <span class="label">📅 Ngày</span>
+                            <span id="confirm-val-date">--</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="label">🕐 Thời gian</span>
+                            <span id="confirm-val-timerange">--</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="label">⏱️ Thời lượng</span>
+                            <span id="confirm-val-duration">--</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="label">🔔 Báo trước</span>
+                            <span id="confirm-val-reminder">--</span>
+                        </div>
+                        <div class="summary-item highlight">
+                            <span class="label">⏰ Thời gian báo</span>
+                            <strong id="confirm-val-remindertime">--</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer Controls -->
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="btn-modal-back">← Quay lại</button>
+                <button class="btn btn-primary" id="btn-modal-next">Tiếp tục →</button>
+                <button class="btn btn-success hidden" id="btn-modal-confirm">✅ Xác nhận tạo lịch</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="js/api.js"></script>
+    <script src="js/stats.js"></script>
+    <script src="js/modal.js"></script>
+    <script src="js/settings.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
